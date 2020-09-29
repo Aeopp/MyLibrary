@@ -145,9 +145,41 @@
   <ItemGroup>
     <ClCompile Include="DELEGATE.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="math.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Scene_mgr.cpp" />
+    <ClCompile Include="singleton_interface.cpp" />
+    <ClCompile Include="sound_mgr.cpp" />
+    <ClCompile Include="Time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DELEGATE.h" />
+    <ClInclude Include="ESceneID.h" />
+    <ClInclude Include="FMOD64\fmod.h" />
+    <ClInclude Include="FMOD64\fmod.hpp" />
+    <ClInclude Include="FMOD64\fmod_codec.h" />
+    <ClInclude Include="FMOD64\fmod_common.h" />
+    <ClInclude Include="FMOD64\fmod_dsp.h" />
+    <ClInclude Include="FMOD64\fmod_dsp_effects.h" />
+    <ClInclude Include="FMOD64\fmod_errors.h" />
+    <ClInclude Include="FMOD64\fmod_output.h" />
+    <ClInclude Include="math.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="Scene_mgr.h" />
+    <ClInclude Include="singleton_interface.h" />
+    <ClInclude Include="sound_mgr.h" />
+    <ClInclude Include="Time.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FMOD64\fmod.cs" />
+    <None Include="FMOD64\fmod.dll" />
+    <None Include="FMOD64\fmodL.dll" />
+    <None Include="FMOD64\fmod_dsp.cs" />
+    <None Include="FMOD64\fmod_errors.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="FMOD64\fmodL_vc.lib" />
+    <Library Include="FMOD64\fmod_vc.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

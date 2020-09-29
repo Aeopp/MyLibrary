@@ -2,59 +2,30 @@
 #include <functional>
 #include <iostream>
 #include "DELEGATE.h"
+#include "singleton_interface.h"
+#include "Time.h"
 
-// 멤버 함수
-// 전역 함수
-// 정적 멤버 함수
-// 삭제해보기
-namespace global
+class super
 {
-	float  function()
-	{
-		std::cout << __FUNCTION__ << std::endl;
-		return 1;
-	}
-}
-class _Class
-{
-
+private:int i = 0;
 public:
-	_Class()
+	bool foo()
 	{
-		static int32_t uid = 0;
-		id = uid++;
-	}
-	int32_t id = 0;
-	void foo()
-	{
-		
-		std::cout << id << std::endl;
-		
-	}
-	static int bar(float&b, float w)
-	{
-		
-		std::cout << __FUNCTION__<< std::endl;
-		return 1;
+		std::cout << i << std::endl;
+		return false; 
 	}
 };
 int main()
 {
-	_Class A;
-	_Class B;
-
-	Delegate<void()> _Delegate;
-
-	auto h1 = _Delegate += std::bind(&_Class::foo, &A);
-	auto h2 = _Delegate += std::bind(&_Class::foo, &B);
-
-	_Delegate.Clear();
+	Time::instance().initialize();
+	super _s;
 	
-	_Delegate.BroadCast();
-
-	_Delegate -= (h1);
+	Time::instance().TimerRegist(1.f, 2.f, 10.f,
+		std::bind(&super::foo, &_s));
 	
-
-	_Delegate.BroadCast();
-	
+	while(1)
+	{
+		Time::instance().update();
+		
+	}
 }

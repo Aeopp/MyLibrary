@@ -1,81 +1,134 @@
+#pragma once
 #include <functional>
 #include <vector>
 #include <map>
-
+#include <unordered_map>
+#include <iostream>
 using namespace std::placeholders;
+
+template<typename ReturnType, typename... ParamTypes>
+struct Delegate_Handler;
 
 template<class T>class Delegate;
 
+// 함수의 호출은 핸들러의 라이프 타임보다 같거나 짧음
 template<typename ReturnType, typename... ParamTypes>
 class Delegate<ReturnType(ParamTypes...)>
 {
 public:
-	using Event_ID = int32_t; 
+	using MyHandleType = Delegate_Handler<ReturnType, ParamTypes...>;
+	using HandleID = int32_t;
 	using EventType = std::function<ReturnType(ParamTypes...)>;
 private:
-	std::map< Event_ID, EventType > EventList;
+	friend class MyHandleType;
+private:
+	HandleID _ID{ 0 };
+	std::map<HandleID, EventType> EventList;
+	std::unordered_map<HandleID, std::reference_wrapper<MyHandleType>> _HandleMap;
 public:
+	~Delegate()noexcept
+	{
+		Clear();
+	}
 	// 람다 or Bind(placeholder) 를 사용해주세요.
-	[[nodiscard]] Event_ID operator +=(EventType _EventRegist)
+	[[nodiscard]] std::shared_ptr<MyHandleType> operator +=(EventType _EventRegist)
 	{
-		static Event_ID _ID{ 0 };
-		
 		EventList.insert(std::make_pair(++_ID, std::move(_EventRegist)));
-		return _ID;
+		auto _Handle = std::make_shared<MyHandleType>(*this, _ID);
+		_HandleMap.emplace(_ID, *_Handle);
+		return _Handle;
 	}
-	size_t operator-=(const Event_ID _DeleteEventID)
+	void operator-=(const HandleID _DeleteEventID)
 	{
-		return EventList.erase(_DeleteEventID);
+		EventList.erase(_DeleteEventID);
+		_HandleMap.erase(_DeleteEventID);
 	}
-	[[nodiscard]] std::vector<ReturnType> BroadCast(ParamTypes&&... Params)
+	[[nodiscard]] auto BroadCast(ParamTypes&&... Params)
 	{
-		std::vector<ReturnType> _ReturnVals;
-		_ReturnVals.reserve(EventList.size());
-		
-		for (auto& [ID,NotifyEvent]: EventList)
+#pragma region RETURN_TYPE_IS_VOID
+		if constexpr (std::is_same_v<ReturnType, void>)
 		{
-			if (NotifyEvent)
-				_ReturnVals.push_back(NotifyEvent(std::forward<ParamTypes>(Params)...));
+			for (auto& [ID, NotifyEvent] : EventList)
+			{
+				auto IsFindIter = _HandleMap.find(ID);
+				if (IsFindIter == std::end(_HandleMap))continue;
+
+				auto& HandleRef = IsFindIter->second;
+
+				if (NotifyEvent && !HandleRef.IsPause())
+					NotifyEvent(std::forward<ParamTypes>(Params)...);
+			}
 		}
-		return _ReturnVals;
+#pragma endregion RETURN_TYPE_IS_VOID
+		else
+		{
+			std::vector<ReturnType> _ReturnVals;
+
+			_ReturnVals.reserve(EventList.size());
+
+			for (auto& [ID, NotifyEvent] : EventList)
+			{
+				auto IsFindIter = _HandleMap.find(ID);
+				if (IsFindIter == std::end(_HandleMap))continue;
+
+				auto& HandleRef = IsFindIter->second;
+
+				if (NotifyEvent && !HandleRef.get().IsPause())
+				{
+					_ReturnVals.push_back(NotifyEvent(std::forward<ParamTypes>(Params)...));
+				}
+			}
+			return _ReturnVals;
+		}
 	}
 	void Clear()
 	{
 		EventList.clear();
+
+		for (auto& [_EventID, Handle] : _HandleMap)
+		{
+			Handle.get().bValid = false;
+		}
+		_HandleMap.clear();
 	}
 };
 
-template<typename... ParamTypes>
-class Delegate<void(ParamTypes...)>
+template<typename ReturnType, typename... ParamTypes>
+struct Delegate_Handler
 {
-public:
-	using Event_ID = int32_t;
-	using EventType = std::function<void(ParamTypes...)>;
 private:
-	std::map< Event_ID, EventType > EventList;
+	using DelegateType = Delegate<ReturnType(ParamTypes...)>;
+	friend class DelegateType;
+	std::reference_wrapper<DelegateType> _DelegateRef;
+	typename DelegateType::HandleID Handle;
+	bool bValid{ true };
+	bool Pause{ false };
+private:
+	Delegate_Handler() {};
+	friend class std::shared_ptr<Delegate_Handler>;
 public:
-	// 람다 or Bind(placeholder) 를 사용해주세요.
-	[[nodiscard]] Event_ID operator +=(EventType _EventRegist)
+	Delegate_Handler(std::reference_wrapper<DelegateType> _Ref,
+		typename DelegateType::HandleID _Handle) :
+		_DelegateRef{ _Ref }, Handle{ _Handle }
+	{};
+	~Delegate_Handler()noexcept
 	{
-		static Event_ID _ID{ 0 };
-
-		EventList.insert(std::make_pair(++_ID, std::move(_EventRegist)));
-		return _ID;
+		Invalidate();
 	}
-	size_t operator-=(const Event_ID _DeleteEventID)
+	inline void Invalidate()
 	{
-		return EventList.erase(_DeleteEventID);
-	}
-	void BroadCast(ParamTypes&&... Params)
-	{
-		for (auto& [ID,NotifyEvent]: EventList)
+		if (bValid)
 		{
-			if (NotifyEvent)
-				NotifyEvent(std::forward<ParamTypes>(Params)...);
+			_DelegateRef.get() -= Handle;
+			bValid = false;
 		}
 	}
-	void Clear()
+	inline void SetPause(const bool _Pause)
 	{
-		EventList.clear();
+		Pause = _Pause;
+	}
+	inline bool IsPause()
+	{
+		return Pause;
 	}
 };

@@ -65,7 +65,6 @@ void Time::NotificationCheck()&
 		
 		if(CurrentDelta<0.f)
 		{
-			std::cout << "이벤트실행" << std::endl;
 			IsNotifyEnd |= Event();
 			CurrentDelta = Repeat;
 		}
@@ -74,7 +73,6 @@ void Time::NotificationCheck()&
 		
 		if (IsNotifyEnd)
 		{
-			std::cout << "이벤트종료" << std::endl;
 			iter = _NotifyEvents.erase(iter);
 			continue; 
 		}

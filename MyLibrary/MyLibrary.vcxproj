@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DELEGATE.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="FMOD64\fmod_dsp_effects.h" />
     <ClInclude Include="FMOD64\fmod_errors.h" />
     <ClInclude Include="FMOD64\fmod_output.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene_mgr.h" />

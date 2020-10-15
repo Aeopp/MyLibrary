@@ -2,7 +2,8 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
-
+#include "math.h"
+#include <string>
 void sound_mgr::initialize()
 {
 	Init();

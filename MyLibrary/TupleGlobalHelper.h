@@ -18,8 +18,8 @@ namespace TupleGlobalHelper
 	template<typename..._TupleTypes>
 	static std::wostream& operator<<(std::wostream& FOut, const std::tuple<_TupleTypes...>& Tuple)
 	{
-		static auto TupleStreamOut = [&FOut](const _TupleTypes&... _TupleElems) {
-			static auto StreamOut = [&FOut](const auto& _TupleElem) {
+		 auto TupleStreamOut = [&FOut](const _TupleTypes&... _TupleElems) {
+			 auto StreamOut = [&FOut](const auto& _TupleElem) {
 				FOut << _TupleElem << std::endl;
 			};
 			(StreamOut(_TupleElems), ...);
@@ -32,8 +32,8 @@ namespace TupleGlobalHelper
 	template<typename..._TupleTypes>
 	static std::wistream& operator>>(std::wistream& FIn, std::tuple<_TupleTypes...>& Tuple)
 	{
-		static auto TupleStreamIn = [&FIn](_TupleTypes&... _TupleElems) {
-			static auto StreamIn = [&FIn](auto& _TupleElem) {
+		 auto TupleStreamIn = [&FIn](_TupleTypes&... _TupleElems) {
+			 auto StreamIn = [&FIn](auto& _TupleElem) {
 				FIn >> _TupleElem;
 			};
 			(StreamIn(_TupleElems), ...);

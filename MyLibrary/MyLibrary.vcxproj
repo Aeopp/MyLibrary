@@ -171,6 +171,7 @@
     <ClInclude Include="singleton_interface.h" />
     <ClInclude Include="sound_mgr.h" />
     <ClInclude Include="Time.h" />
+    <ClInclude Include="TupleGlobalHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FMOD64\fmod.cs" />

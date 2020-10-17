@@ -101,6 +101,9 @@
     <ClInclude Include="InputManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="TupleGlobalHelper.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="FMOD64\fmod.cs" />

@@ -107,13 +107,15 @@ private:
 	Delegate_Handler() {};
 	friend class std::shared_ptr<Delegate_Handler>;
 public:
+	bool bFree{ false };
 	Delegate_Handler(std::reference_wrapper<DelegateType> _Ref,
 		typename DelegateType::HandleID _Handle) :
 		_DelegateRef{ _Ref }, Handle{ _Handle }
 	{};
 	~Delegate_Handler()noexcept
 	{
-		Invalidate();
+		if(!bFree)
+			Invalidate();
 	}
 	inline void Invalidate()
 	{
